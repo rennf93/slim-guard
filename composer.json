@@ -1,0 +1,52 @@
+{
+    "name": "rennf93/slim-guard",
+    "description": "Slim 4 adapter for guard-core-php: composes the psr15-guard PSR-15 middleware into Slim's App with factory wiring, app and route-group attachment, and body-parsing order guidance; no security logic of its own",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "rennf93/guard-core-php": "^0.1.0",
+        "rennf93/psr15-guard": "^0.1.0",
+        "slim/slim": "^4.12",
+        "psr/http-factory": "^1.0"
+    },
+    "require-dev": {
+        "slim/psr7": "^1.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "RenzoFranceschini\\GuardCoreSlim\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "php bin/test_slim.php",
+        "lint": "for f in $(find src bin -name '*.php'); do php -l \"$f\" > /dev/null || exit 1; done && echo LINT_OK"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../guard-core-php",
+            "canonical": false
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/rennf93/guard-core-php.git"
+        },
+        {
+            "type": "path",
+            "url": "../psr15-guard",
+            "canonical": false
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/rennf93/psr15-guard.git"
+        }
+    ],
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
