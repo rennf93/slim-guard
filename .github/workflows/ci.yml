@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (php ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Supply-chain tradeoff, deliberate: this pins a MOVING branch of the core
+      # engine, not an immutable ref, because the core has no Packagist dist yet.
+      # The composer.json constraint is the tagged ^0.1.0 and the lock pins
+      # v0.1.0; the path repository plus this update step only float within
+      # that constraint. Once the core publishes to Packagist, this step and
+      # the path repository can drop in favor of the distribution channel.
+      - name: Checkout guard-core-php (path repository)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: rennf93/guard-core-php
+          ref: guard-core-port-php
+          path: core-checkout
+          persist-credentials: false
+
+      - name: Place guard-core-php at the path repository location
+        run: mv core-checkout ../guard-core-php
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          composer update rennf93/guard-core-php --no-interaction
+
+      - name: php -l sweep
+        run: for f in $(find src bin -name '*.php'); do php -l "$f" > /dev/null || exit 1; done && echo LINT_OK
+
+      - name: test_slim
+        env:
+          REDIS_HOST: 127.0.0.1
+        run: php bin/test_slim.php
+
+  composer-audit:
+    name: Composer audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Checkout guard-core-php (path repository)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: rennf93/guard-core-php
+          ref: guard-core-port-php
+          path: core-checkout
+          persist-credentials: false
+
+      - name: Place guard-core-php at the path repository location
+        run: mv core-checkout ../guard-core-php
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          composer update rennf93/guard-core-php --no-interaction
+
+      - name: Composer audit
+        run: composer audit

@@ -1,0 +1,49 @@
+name: Scheduled Lint
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  scheduled-composer-audit-lint:
+    name: Weekly composer audit + php -l
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Checkout guard-core-php (path repository)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: rennf93/guard-core-php
+          ref: guard-core-port-php
+          path: core-checkout
+          persist-credentials: false
+
+      - name: Place guard-core-php at the path repository location
+        run: mv core-checkout ../guard-core-php
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.3'
+          extensions: mbstring
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --no-progress
+          composer update rennf93/guard-core-php --no-interaction
+
+      - name: php -l sweep
+        run: for f in $(find src bin -name '*.php'); do php -l "$f" > /dev/null || exit 1; done && echo LINT_OK
+
+      - name: Composer audit
+        run: composer audit
