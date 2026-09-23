@@ -1,0 +1,44 @@
+name: Greetings
+
+on: [pull_request_target, issues]
+
+permissions: {}
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d # v3.1.0
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        issue_message: |
+            Thanks for opening your first issue on **slim-guard**!
+
+            To help us triage quickly, please make sure your report includes:
+            - A clear reproduction (a short PHP snippet or failing test is ideal)
+            - Output of `php -v` (the adapter requires PHP 8.2 or later) and your Slim 4 version
+            - The `rennf93/slim-guard`, `rennf93/psr15-guard`, and `rennf93/guard-core-php` versions in your `composer.lock`
+            - Your PSR-7 implementation (slim/psr7, Nyholm, Guzzle) and how you attach the guard (app or route group)
+            - Redis configuration if relevant (the engine uses Redis for distributed bans and rate limiting)
+
+            A few pointers:
+            - Scan [README.md](../blob/master/README.md) for adapter usage, and the [guard-core-php docs](https://github.com/rennf93/guard-core-php) for engine behavior.
+            - **Security vulnerability?** Do **not** open a public issue - please use GitHub's private vulnerability reporting.
+
+            Thanks again - a maintainer will be with you soon.
+        pr_message: |
+            Thanks for opening your first pull request on **slim-guard**!
+
+            Quick checklist before review (most of these are enforced by CI, but worth a glance):
+            - [ ] The PR body says `Closes #N` for an open issue (the `issue-link` check enforces it); chores take the `no-issue` label
+            - [ ] `composer lint` passes (the `php -l` sweep over `src` and `bin`)
+            - [ ] `composer test` passes (`REDIS_HOST` set to a reachable Redis includes the integration cases)
+            - [ ] `composer audit` is clean
+            - [ ] No security logic added to `src/`; the wiring layer keeps composing psr15-guard, not duplicating it
+            - [ ] `vendor/` and generated artifacts are not committed
+            - [ ] If you touched the public API or adapter behavior, updated [README.md](../blob/master/README.md) and the docs site
+
+            Welcome aboard - a maintainer will review shortly.
