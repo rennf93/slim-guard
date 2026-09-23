@@ -170,7 +170,7 @@ AGENTS.md / CLAUDE.md                 Agent guide (byte-identical copies)
 
 ## Best Practices
 
-- `main` is protected. Work on a branch, push, open a PR (draft PRs are fine). Never push to `main`, never tag, never publish a release as part of agent work.
+- `master` is protected. Work on a branch, push, open a PR (draft PRs are fine). Never push to `master`, never tag, never publish a release as part of agent work.
 - Never `git add vendor/`, `.DS_Store`, or any stray file. Stage explicit paths only.
 - Keep the adapter thin. If a change adds detection, verdict logic, or response shaping, it belongs in guard-core-php (engine) or psr15-guard (PSR-15 translation), not here. slim-guard's entire surface is construction, factory resolution, and attachment.
 - Configuration is constructor options: consumers build the `SecurityConfig` and `GuardEngine` themselves and hand them to `SlimGuard::forApp($app, $engine)` or `new SlimGuard($responseFactory, $streamFactory, $engine)`. Do not add a config-array-to-SecurityConfig mapper; that is a parallel config surface.
