@@ -9,7 +9,8 @@ rennf93/slim-guard (https://github.com/rennf93/slim-guard) is a Slim 4 adapter f
 - This repository contains NO security logic and NO response translation. Detection, rate limiting, bans, verdicts, block-response shaping, and the fail-closed path all live in guard-core-php (engine) and psr15-guard (PSR-15 adapter). slim-guard only wires.
 - Design, one sentence: Slim 4 middleware IS PSR-15 middleware and psr15-guard already provides exactly that, so slim-guard composes it instead of copying it.
 - PHP `^8.2`. Autoload is PSR-4: `RenzoFranceschini\GuardCoreSlim\` maps to `src/`.
-- Shipped tags: none. There are no git tags and no releases. `main` is protected: never push to it, never merge into it, never create tags or releases.
+- Shipped tags: none. There are no git tags and no releases. `master` is protected: never push to it, never merge into it, never create tags or releases.
+- Docs site: MkDocs Material in `docs/` (strict build in CI, gh-deploy on push to `master` touching docs sources). Runnable demos in `examples/` are exercised by the live-smoke workflow.
 
 ## Ecosystem Position
 
@@ -78,6 +79,9 @@ Composer scripts (composer.json `scripts`; these are the only two):
 | --- | --- |
 | `composer test` | `php bin/test_slim.php` |
 | `composer lint` | `for f in $(find src bin -name '*.php'); do php -l "$f" > /dev/null || exit 1; done && echo LINT_OK` |
+| `mkdocs build --strict` | Build the docs site (run with `docker run --rm -v "$PWD":/work -w /work python:3.12-slim sh -c "pip install -q mkdocs-material && mkdocs build --strict"`; the `site/` output is gitignored) |
+| `docker compose -f examples/simple_app/docker-compose.yml up --build -d --wait` | Bring up the simple example app plus Redis; then run the curl assertions from `.github/workflows/live-smoke.yml` |
+| `docker compose -f examples/advanced_app/docker-compose.yml up --build -d --wait` | Same for the advanced example (assertions in `examples/advanced_app/README.md`) |
 
 Direct commands used by CI (verified in `.github/workflows/ci.yml`; the same install, lint, and test steps appear in `release.yml` and `scheduled-lint.yml`):
 
@@ -88,18 +92,36 @@ Direct commands used by CI (verified in `.github/workflows/ci.yml`; the same ins
 - `composer audit` (Composer audit job, PHP 8.3)
 - `composer validate --strict` must stay clean (run it after any composer.json edit)
 
-`bin/` contains exactly one script: `bin/test_slim.php` (the whole test suite, plain PHP, no PHPUnit). There is no Makefile, no PHPUnit config, no PHPStan, no PHP-CS-Fixer, and no docker setup in this repo.
+`bin/` contains exactly one script: `bin/test_slim.php` (the whole test suite, plain PHP, no PHPUnit). There is no PHPUnit config, no PHPStan, and no PHP-CS-Fixer in this repo. There is no host PHP here either; examples and docs are verified with Docker (`composer:2` and `php:8.3-cli-alpine` images, `python:3.12-slim` for mkdocs).
 
 ## Project Structure
 
 ```
 .github/dependabot.yml                Weekly dependabot: github-actions + composer (grouped)
+.github/labels.yml                    Label registry for sync-labels
+.github/labeler.yml                   PR area-label rules for labeler
 .github/workflows/ci.yml              CI: test matrix php 8.2/8.3/8.4 + redis service + composer audit
 .github/workflows/release.yml         Release Gate: same suite, runs on v* tags
 .github/workflows/scheduled-lint.yml  Weekly cron (Mon 04:00 UTC): php -l sweep + composer audit
+.github/workflows/issue-link.yml      PR must close an open issue or carry no-issue
+.github/workflows/summary.yml         AI issue summary on the needs-summary label
+.github/workflows/sync-labels.yml     Applies .github/labels.yml on push/dispatch
+.github/workflows/greetings.yml       First-issue / first-PR welcome messages
+.github/workflows/labeler.yml         Area labels from .github/labeler.yml
+.github/workflows/stale.yml           Daily stale sweep with reminders
+.github/workflows/live-smoke.yml      Dockerized compose smoke over examples/simple_app
+.github/workflows/docs.yml            mkdocs strict build + gh-deploy on master docs changes
+.github/workflows/container-release.yml  Publishes examples/advanced_app image to ghcr.io
+.github/workflows/upstream-drift.yml  Daily suite run against guard-core-php@master
 bin/test_slim.php                     Entire test suite, plain PHP runner with a T assertion harness
 composer.json                         Package metadata, autoload, scripts, repositories, platform pin
 composer.lock                         Locked deps; tracked; regenerate only deliberately
+docs/index.md                         Docs home: what the adapter is, install, quick start
+docs/usage.md                         SlimGuard surface, attachment points, ordering, verdicts
+docs/configuration.md                 SecurityConfig surface pointers, Redis, body bound
+examples/simple_app/                  Minimal guarded Slim app (compose app + redis), live-smoke target
+examples/advanced_app/                Production-shaped app (env config, admin ban manager routes)
+mkdocs.yml                            MkDocs Material site definition
 src/SlimGuard.php                     The Slim wiring layer (factory resolution + attachment)
 src/.agents/skills/slim-guard/        Package skill (SKILL.md)
 LICENSE                               MIT, (c) 2026 Renzo Franceschini
@@ -122,7 +144,10 @@ AGENTS.md / CLAUDE.md                 Agent guide (byte-identical copies)
 - Transitive (not declared here): `psr/http-message`, `psr/http-server-handler`, `psr/http-server-middleware` (via slim/slim and psr15-guard), `nikic/fast-route`, `psr/container`, `psr/log` (via slim/slim), `fig/http-message-util` (via slim/psr7).
 - No Slim service container is required: every test runs against a bare `AppFactory::create()` app.
 - CI runs a `redis:7-alpine` service container on port 6379 with health checks for the Redis integration tests.
-- Actions are pinned by commit SHA: `actions/checkout` v7.0.1 and `shivammathur/setup-php` 2.37.2.
+- Actions are pinned by commit SHA: `actions/checkout` v7.0.1, `shivammathur/setup-php` 2.37.2, `actions/ai-inference` v3, `crazy-max/ghaction-github-labeler` v6.0.0, `actions/first-interaction` v3.1.0, `actions/labeler` v7.0.0, `actions/stale` v11.0.0, `docker/login-action` v4.6.0, `docker/setup-compose-action` v2.4.0.
+- Examples run on `php:8.3-cli-alpine` (PHP built-in webserver, non-root in the advanced app) with composer builds from `composer:2`; Redis is `redis:7-alpine`.
+- Docs site: mkdocs-material, strict build, deployed to GitHub Pages by `docs.yml` on `master` pushes touching `docs/**`, `mkdocs.yml`, `README.md`, or `src/**`.
+- The examples are demo code, not package surface: they live under `examples/`, carry their own composer.json (no committed lock file), and must never be autoloaded by the library.
 
 ## Testing Guidelines
 
@@ -145,7 +170,7 @@ AGENTS.md / CLAUDE.md                 Agent guide (byte-identical copies)
 
 ## Best Practices
 
-- `main` is protected. Work on a branch, push, open a PR (draft PRs are fine). Never push to `main`, never tag, never publish a release as part of agent work.
+- `master` is protected. Work on a branch, push, open a PR (draft PRs are fine). Never push to `master`, never tag, never publish a release as part of agent work.
 - Never `git add vendor/`, `.DS_Store`, or any stray file. Stage explicit paths only.
 - Keep the adapter thin. If a change adds detection, verdict logic, or response shaping, it belongs in guard-core-php (engine) or psr15-guard (PSR-15 translation), not here. slim-guard's entire surface is construction, factory resolution, and attachment.
 - Configuration is constructor options: consumers build the `SecurityConfig` and `GuardEngine` themselves and hand them to `SlimGuard::forApp($app, $engine)` or `new SlimGuard($responseFactory, $streamFactory, $engine)`. Do not add a config-array-to-SecurityConfig mapper; that is a parallel config surface.

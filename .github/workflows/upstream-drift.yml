@@ -1,0 +1,59 @@
+name: Upstream Drift
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  upstream-drift:
+    name: Test against guard-core-php@master
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - name: Checkout slim-guard
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Checkout guard-core-php@master
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: rennf93/guard-core-php
+          ref: master
+          path: core-upstream
+          persist-credentials: false
+
+      # No host PHP toolchain: run the adapter suite inside the composer image,
+      # pointing the guard-core-php dependency at upstream master via the
+      # composer.json path repository (../guard-core-php).
+      - name: Run the adapter test suite against guard-core-php@master
+        run: |
+          docker run --rm --network host \
+            -v "$PWD":/work \
+            -v "$PWD/core-upstream":/guard-core-php \
+            -w /work \
+            -e REDIS_HOST=127.0.0.1 \
+            composer:2 sh -c '
+              set -e
+              composer require --no-update --no-interaction "rennf93/guard-core-php:dev-master"
+              composer update --no-interaction --no-progress "rennf93/guard-core-php"
+              composer lint
+              php bin/test_slim.php
+            '

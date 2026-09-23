@@ -1,2 +1,5 @@
 vendor/
+.phpunit.*
+.phpunit.result.cache
 .DS_Store
+site/

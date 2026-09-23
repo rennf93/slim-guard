@@ -1,0 +1,66 @@
+services:
+  advanced-app:
+    build:
+      context: ../..
+      dockerfile: examples/advanced_app/Dockerfile
+      secrets:
+        - github_token
+    image: slim-guard-advanced-app:local
+    ports:
+      - "8081:8080"
+    environment:
+      # Trust the compose network for forwarded headers when a reverse proxy
+      # hop is in front (172.16.0.0/12 covers the standard docker bridge
+      # gateway, 192.168.65.0/24 the Docker Desktop one); X-Forwarded-For from
+      # other clients is ignored.
+      - TRUSTED_PROXIES=${TRUSTED_PROXIES:-172.16.0.0/12,10.0.0.0/8,192.168.65.0/24}
+      - TRUSTED_PROXY_DEPTH=${TRUSTED_PROXY_DEPTH:-1}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PREFIX=${REDIS_PREFIX:-guard_core_slim:}
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-admin-token-change-me}
+      - RATE_LIMIT=${RATE_LIMIT:-30}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-60}
+      - BURST_LIMIT=${BURST_LIMIT:-3}
+      - BURST_WINDOW=${BURST_WINDOW:-60}
+      - AUTO_BAN_THRESHOLD=${AUTO_BAN_THRESHOLD:-5}
+      - AUTO_BAN_DURATION=${AUTO_BAN_DURATION:-300}
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 256M
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --save 60 1 --loglevel warning --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 192M
+
+volumes:
+  redis-data:
+
+secrets:
+  github_token:
+    environment: GITHUB_TOKEN

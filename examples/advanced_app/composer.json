@@ -1,0 +1,31 @@
+{
+    "name": "rennf93/slim-guard-example-advanced",
+    "description": "Production-shaped guarded Slim 4 app demonstrating rennf93/slim-guard",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "rennf93/slim-guard": "dev-master",
+        "rennf93/psr15-guard": "^0.1.0",
+        "rennf93/guard-core-php": "^0.1.0",
+        "slim/slim": "^4.12",
+        "slim/psr7": "^1.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "repositories": [
+        { "type": "vcs", "url": "https://github.com/rennf93/guard-core-php" },
+        { "type": "vcs", "url": "https://github.com/rennf93/psr15-guard" },
+        { "type": "vcs", "url": "https://github.com/rennf93/slim-guard" }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "platform": {
+            "php": "8.3.0"
+        }
+    }
+}
