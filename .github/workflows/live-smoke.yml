@@ -33,6 +33,8 @@ jobs:
           persist-credentials: false
 
       - name: Bring the smoke stack up (guarded app + redis)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           docker compose -p "$LIVE_SMOKE_PROJECT" -f examples/simple_app/docker-compose.yml up --build -d --wait
 

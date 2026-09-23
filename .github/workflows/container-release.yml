@@ -51,6 +51,8 @@ jobs:
 
       - name: Build with Docker Compose
         working-directory: ./examples/advanced_app
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           docker compose build
 

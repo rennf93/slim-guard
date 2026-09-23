@@ -5,7 +5,13 @@ FROM composer:2 AS build
 WORKDIR /app
 
 COPY examples/advanced_app/composer.json ./
-RUN composer install --no-interaction --no-progress --no-dev
+# Optional GitHub token (build secret) raises the GitHub API rate limit for
+# the VCS repositories; builds also work without it when the limit allows.
+RUN --mount=type=secret,id=github_token \
+    if [ -s /run/secrets/github_token ]; then \
+      composer config -g github-oauth.github.com "$(cat /run/secrets/github_token)"; \
+    fi && \
+    composer install --no-interaction --no-progress --prefer-dist --no-dev
 
 FROM php:8.3-cli-alpine
 

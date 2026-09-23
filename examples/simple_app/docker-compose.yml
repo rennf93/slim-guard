@@ -3,6 +3,8 @@ services:
     build:
       context: ../..
       dockerfile: examples/simple_app/Dockerfile
+      secrets:
+        - github_token
     image: slim-guard-simple-app:local
     ports:
       - "8080:8080"
@@ -35,3 +37,7 @@ services:
 
 volumes:
   redis-data:
+
+secrets:
+  github_token:
+    environment: GITHUB_TOKEN
