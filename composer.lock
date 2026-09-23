@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "17da63754773759e862ad2d78f7b4c4f",
+    "content-hash": "808c75ec67fa0d634ac2277af1073fd6",
     "packages": [
         {
             "name": "nikic/fast-route",
@@ -382,16 +382,16 @@
         },
         {
             "name": "rennf93/guard-core-php",
-            "version": "v0.1.0",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rennf93/guard-core-php.git",
-                "reference": "89e8bd596257e607c427fc0cc26b80731cf80279"
+                "reference": "87992d8d078b9461e176f4bb4cfbf5730545e2d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rennf93/guard-core-php/zipball/89e8bd596257e607c427fc0cc26b80731cf80279",
-                "reference": "89e8bd596257e607c427fc0cc26b80731cf80279",
+                "url": "https://api.github.com/repos/rennf93/guard-core-php/zipball/87992d8d078b9461e176f4bb4cfbf5730545e2d5",
+                "reference": "87992d8d078b9461e176f4bb4cfbf5730545e2d5",
                 "shasum": ""
             },
             "require": {
@@ -419,23 +419,23 @@
             ],
             "description": "PHP port of guard-core: behavioral WAF engine (detection engine conformance milestone)",
             "support": {
-                "source": "https://github.com/rennf93/guard-core-php/tree/v0.1.0",
+                "source": "https://github.com/rennf93/guard-core-php/tree/v4.0.4",
                 "issues": "https://github.com/rennf93/guard-core-php/issues"
             },
-            "time": "2026-09-20T01:38:59+00:00"
+            "time": "2026-09-23T23:14:46+00:00"
         },
         {
             "name": "rennf93/psr15-guard",
-            "version": "v0.1.0",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rennf93/psr15-guard.git",
-                "reference": "55c17a9cd1d93ee1abac9021b1cbf1ac897798f3"
+                "reference": "7fd3cc51745c678372ef99e80a401b9c12018539"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rennf93/psr15-guard/zipball/55c17a9cd1d93ee1abac9021b1cbf1ac897798f3",
-                "reference": "55c17a9cd1d93ee1abac9021b1cbf1ac897798f3",
+                "url": "https://api.github.com/repos/rennf93/psr15-guard/zipball/7fd3cc51745c678372ef99e80a401b9c12018539",
+                "reference": "7fd3cc51745c678372ef99e80a401b9c12018539",
                 "shasum": ""
             },
             "require": {
@@ -444,7 +444,7 @@
                 "psr/http-message": "^1.1|^2.0",
                 "psr/http-server-handler": "^1.0",
                 "psr/http-server-middleware": "^1.0",
-                "rennf93/guard-core-php": "^0.1.0"
+                "rennf93/guard-core-php": "^4.0.4"
             },
             "require-dev": {
                 "nyholm/psr7": "^1.8"
@@ -468,10 +468,10 @@
             ],
             "description": "PSR-15 middleware adapter for guard-core-php: translates PSR-7 server requests to the guard-core engine and block verdicts back to PSR-7 responses",
             "support": {
-                "source": "https://github.com/rennf93/psr15-guard/tree/v0.1.0",
+                "source": "https://github.com/rennf93/psr15-guard/tree/v1.0.0",
                 "issues": "https://github.com/rennf93/psr15-guard/issues"
             },
-            "time": "2026-09-20T01:58:09+00:00"
+            "time": "2026-09-23T23:26:22+00:00"
         },
         {
             "name": "slim/slim",
