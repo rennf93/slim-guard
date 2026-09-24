@@ -2,6 +2,8 @@
 
 Slim 4 adapter for [guard-core-php](https://github.com/rennf93/guard-core-php): wires the guard into Slim's middleware stack. It composes [psr15-guard](https://github.com/rennf93/psr15-guard) (the PSR-15 middleware adapter for the same engine) and adds the Slim-native integration layer: PSR-7 factory wiring from Slim's `App`, one-call attachment to the app or a route group, and the body-parsing ordering guidance. Works with Slim 4.
 
+Docs: https://rennf93.github.io/slim-guard/
+
 This package contains no security logic and no detection logic of its own. Every verdict comes from `GuardEngine::execute()`, and the fail-secure path (block translation, fail-closed 500) is inherited from psr15-guard, not reimplemented here.
 
 ## Design: composition, not duplication
@@ -18,19 +20,6 @@ The relationship is deliberate: slim-guard is the ecosystem's Slim flavor of the
 
 ```bash
 composer require rennf93/slim-guard
-```
-
-Until `rennf93/guard-core-php` and `rennf93/psr15-guard` have Packagist releases, point composer at their repositories and allow dev stability:
-
-```json
-{
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "repositories": [
-        { "type": "vcs", "url": "https://github.com/rennf93/guard-core-php" },
-        { "type": "vcs", "url": "https://github.com/rennf93/psr15-guard" }
-    ]
-}
 ```
 
 ## Usage
@@ -79,7 +68,7 @@ composer test
 
 ## Status
 
-No git tags or releases yet; the package installs from source (`dev-main`). The engine, `rennf93/guard-core-php`, is at `v0.1.0`; the PSR-15 adapter it composes, `rennf93/psr15-guard`, is at `v0.1.0`.
+Released: v1.0.0 on Packagist. The engine, `rennf93/guard-core-php`, is at v4.0.4; the PSR-15 adapter it composes, `rennf93/psr15-guard`, is at v1.0.0.
 
 ## License
 
