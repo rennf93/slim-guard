@@ -2,7 +2,7 @@
 
 Slim 4 adapter for [guard-core-php](https://github.com/rennf93/guard-core-php): wires the guard into Slim's middleware stack. It composes [psr15-guard](https://github.com/rennf93/psr15-guard) (the PSR-15 middleware adapter for the same engine) and adds the Slim-native integration layer: PSR-7 factory wiring from Slim's `App`, one-call attachment to the app or a route group, and the body-parsing ordering guidance. Works with Slim 4.
 
-Docs: https://rennf93.github.io/slim-guard/
+Docs: <https://rennf93.github.io/slim-guard/>
 
 This package contains no security logic and no detection logic of its own. Every verdict comes from `GuardEngine::execute()`, and the fail-secure path (block translation, fail-closed 500) is inherited from psr15-guard, not reimplemented here.
 
