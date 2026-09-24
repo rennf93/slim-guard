@@ -6,8 +6,8 @@
     "require": {
         "php": "^8.2",
         "rennf93/slim-guard": "dev-master",
-        "rennf93/psr15-guard": "^0.1.0",
-        "rennf93/guard-core-php": "^0.1.0",
+        "rennf93/psr15-guard": "^1.0.0",
+        "rennf93/guard-core-php": "^4.0.4",
         "slim/slim": "^4.12",
         "slim/psr7": "^1.7"
     },
