@@ -4,12 +4,3 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    groups:
-      composer-packages:
-        patterns:
-          - "*"
