@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "rennf93/guard-core-php": "^4.0.4",
+        "rennf93/guard-core-php": "^4.1.0",
         "rennf93/psr15-guard": "^1.0.0",
         "slim/slim": "^4.12",
         "psr/http-factory": "^1.0"
